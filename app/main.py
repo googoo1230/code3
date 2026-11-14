@@ -99,13 +99,37 @@ def show(cols, rows, limit=None, feature=None):
     # 나머지 기능의 표 출력 방식은 유지한다.
     column_widths = {
         "1": {"병원명": 24, "종별": 10, "시도": 8, "시군구": 10, "주소": 34, "전화": 15},
-        "4": {"병원명": 24, "종별": 10, "주소": 36, "진료과목": 42},
+        "4": {"병원명": 18, "종별": 8, "주소": 26, "진료과목": 28},
     }
     widths = column_widths.get(feature)
     options = {}
     if widths:
         options["maxcolwidths"] = [widths.get(col) for col in cols]
         options["disable_numparse"] = True
+    if feature == "4" and "진료과목" in cols:
+        # 진료과목을 쉼표 단위로 줄바꿈해 열 너비를 일정하게 유지한다.
+        from wcwidth import wcswidth
+
+        dept_index = cols.index("진료과목")
+        dept_width = widths["진료과목"]
+        formatted_rows = []
+        for row in rows:
+            values = list(row)
+            departments = str(values[dept_index] or "").split(", ")
+            lines = []
+            current = ""
+            for department in departments:
+                candidate = f"{current}, {department}" if current else department
+                if current and wcswidth(candidate) > dept_width:
+                    lines.append(current)
+                    current = department
+                else:
+                    current = candidate
+            if current:
+                lines.append(current)
+            values[dept_index] = "\\n".join(lines)
+            formatted_rows.append(values)
+        rows = formatted_rows
     print(tabulate(rows, headers=cols, tablefmt="simple_grid", **options))
     if limit is None:
         print(f"표시된 결과: {len(rows)}건")
