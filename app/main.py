@@ -90,12 +90,23 @@ def ask(field):
         return raw
 
 
-def show(cols, rows, limit=None):
+def show(cols, rows, limit=None, feature=None):
     if not rows:
         print("\n조건에 맞는 결과가 없습니다.")
         return
     print()
-    print(tabulate(rows, headers=cols, tablefmt="simple_grid"))
+    # 긴 주소와 진료과목 목록을 셀 안에서 줄바꿈한다.
+    # 나머지 기능의 표 출력 방식은 유지한다.
+    column_widths = {
+        "1": {"병원명": 24, "종별": 10, "시도": 8, "시군구": 10, "주소": 34, "전화": 15},
+        "4": {"병원명": 24, "종별": 10, "주소": 36, "진료과목": 42},
+    }
+    widths = column_widths.get(feature)
+    options = {}
+    if widths:
+        options["maxcolwidths"] = [widths.get(col) for col in cols]
+        options["disable_numparse"] = True
+    print(tabulate(rows, headers=cols, tablefmt="simple_grid", **options))
     if limit is None:
         print(f"표시된 결과: {len(rows)}건")
     else:
@@ -106,7 +117,7 @@ def run_feature(key):
     title, func, fields, limit = FEATURES[key]
     print(f"\n[{title}]")
     args = {field[0]: ask(field) for field in fields}
-    show(*func(**args), limit=limit)
+    show(*func(**args), limit=limit, feature=key)
 
 
 def main():
