@@ -1,0 +1,17 @@
+# 개인 MySQL 비밀번호를 포함한 파일은 GitHub에 올리지 않습니다.
+app/config.py
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# 데이터 원본 / 대용량 덤프는 GitHub 대신 별도로 보관합니다.
+hospital_db.sql
+*.csv
+*.sql.bak
+
+.DS_Store
+.idea/
+.vscode/
+.pytest_cache/
