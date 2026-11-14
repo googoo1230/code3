@@ -127,7 +127,7 @@ def show(cols, rows, limit=None, feature=None):
                     current = candidate
             if current:
                 lines.append(current)
-            values[dept_index] = "\\n".join(lines)
+            values[dept_index] = "\n".join(lines)
             formatted_rows.append(values)
         rows = formatted_rows
     print(tabulate(rows, headers=cols, tablefmt="simple_grid", **options))
